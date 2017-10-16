@@ -48,3 +48,13 @@ instance Semigroup b => Semigroup (AccumulateRight a b) where
   AccumulateRight (Failure f1) <> AccumulateRight (Failure f2) =
     AccumulateRight (Failure f2)
     
+newtype AccumulateBoth a b = AccumulateBoth (Validation a b) deriving (Eq, Show)
+instance (Semigroup a, Semigroup b) => Semigroup (AccumulateBoth a b) where
+  AccumulateBoth (Failure f1) <> AccumulateBoth (Failure f2) =
+    AccumulateBoth (Failure $ f1 <> f2)
+  AccumulateBoth (Success s1) <> AccumulateBoth (Success s2) =
+    AccumulateBoth (Success $ s1 <> s2)
+  AccumulateBoth (Failure f) <> AccumulateBoth (Success s) =
+    AccumulateBoth (Success s)
+  AccumulateBoth (Success s) <> AccumulateBoth (Failure f) =
+    AccumulateBoth (Failure f)
