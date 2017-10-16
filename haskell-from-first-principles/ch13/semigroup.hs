@@ -1,8 +1,12 @@
-import Data.Semigroup
+import Data.Semigroup (Semigroup, (<>))
+import Data.Monoid (Monoid, mempty, mappend)
 
 newtype Identity a = Identity a
 instance Semigroup a => Semigroup (Identity a) where
   Identity x <> Identity y = Identity (x <> y)
+instance (Semigroup a, Monoid a) => Monoid (Identity a) where
+  mempty = Identity mempty
+  mappend = (<>)
 
 data Two a b = Two a b
 instance (Semigroup a, Semigroup b) => Semigroup (Two a b) where
