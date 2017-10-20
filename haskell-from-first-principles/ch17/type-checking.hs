@@ -46,4 +46,7 @@ summed = sum <$> ((,) <$> x <*> y)
     x = lookup 3 lst
     y :: Maybe Integer
     y = lookup 2 lst
-    
+-- or
+-- summed' :: Maybe Integer
+-- summed' = pure sum <*> (pure (,) <*> x <*> y)
+
