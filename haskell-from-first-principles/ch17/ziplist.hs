@@ -19,10 +19,33 @@ instance Applicative List where
   _ <*> Nil = Nil
   (Cons f fs) <*> xs =  (f <$> xs) <> (fs <*> xs)
 
-functions = Cons (+1) (Cons (*2) Nil)
-values = Cons 1 (Cons 2 Nil)
+-- then the actual zippy thingy
 
-instance (Monoid a) => Monoid (ZipList a) where
-  mempty = undefined
-  mappend = undefined
+newtype ZipList' a = ZipList' (List a) deriving (Eq, Show)
+
+-- a little helper function
+zipCons :: a -> (ZipList' a) -> (ZipList' a)
+zipCons x (ZipList' zl) = ZipList' (Cons x zl)
+
+instance (Monoid a) => Monoid (ZipList' a) where
+  mempty = ZipList' Nil
+  mappend (ZipList' Nil) l = l
+  mappend l (ZipList' Nil) = l
+  mappend (ZipList' (Cons x xs)) (ZipList' (Cons y ys)) =
+    zipCons (x `mappend` y) (mappend (ZipList' xs) (ZipList' ys))
+
+instance Functor ZipList' where
+  fmap _ (ZipList' Nil) = ZipList' Nil
+  fmap f (ZipList' (Cons x xs)) = zipCons (f x) $ fmap f (ZipList' xs)
+
+instance Applicative ZipList' where
+  pure f = ZipList' (Cons f Nil)
+  (ZipList' Nil) <*> xs = ZipList' Nil
+  fs <*> (ZipList' Nil) = ZipList' Nil
+  (ZipList' (Cons f fs)) <*> (ZipList' (Cons x xs)) = zipCons (f x) ((ZipList' fs) <*> (ZipList' xs))
   
+lst = Cons 1 (Cons 2 (Cons 3 Nil))
+zLst = ZipList' lst
+fzLst = ZipList' (Cons (+1) (Cons (*2) Nil))
+
+
