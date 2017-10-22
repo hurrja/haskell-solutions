@@ -43,9 +43,3 @@ instance Applicative ZipList' where
   (ZipList' Nil) <*> xs = ZipList' Nil
   fs <*> (ZipList' Nil) = ZipList' Nil
   (ZipList' (Cons f fs)) <*> (ZipList' (Cons x xs)) = zipCons (f x) ((ZipList' fs) <*> (ZipList' xs))
-  
-lst = Cons 1 (Cons 2 (Cons 3 Nil))
-zLst = ZipList' lst
-fzLst = ZipList' (Cons (+1) (Cons (*2) Nil))
-
-
