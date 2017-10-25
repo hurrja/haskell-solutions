@@ -1,6 +1,12 @@
--- had to do some diggin' around to figure out how to approach this problem
-x = (pure :: a -> [a]) 1
-y = ((<*>) :: [a -> b] -> [a] -> [b]) [(+1)] [1..2]
+x :: a -> [a]
+x = pure
+y :: [a -> b] -> [a] -> [b]
+y = (<*>)
 
-z = (pure :: a -> IO a) "foo"
-w = ((<*>) :: IO (a -> b) -> IO a -> IO b) (pure ("bar" ++)) $ pure "foo"
+z :: a -> IO a
+z = pure
+w :: IO (a -> b) -> IO a -> IO b
+w = (<*>)
+
+u :: Monoid a => b -> (a, b)
+u = pure
