@@ -14,4 +14,4 @@ a = flip (<*>)
 
 meh :: Monad m => [a] -> (a -> m b) -> m [b]
 meh [] _ = pure []
-meh (x:xs) f =  ((:) (f x)) =<< meh xs
+meh (x:xs) f =  fmap (:) (f x) <*> meh xs f
