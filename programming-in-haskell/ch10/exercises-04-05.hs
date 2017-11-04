@@ -17,7 +17,4 @@ adder = readCount >>= readNumbers >>= writeSum
     writeSum xs = do
       putStr "The total is "
       putStrLn $ show $ sum xs
-    
-     
       
-    
