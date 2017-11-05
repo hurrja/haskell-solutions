@@ -14,10 +14,9 @@ readLine = go ""
       c <- getChar
       case c of
         '\n' -> putChar c >> pure acc
-        '\DEL' -> if not (null acc)
-                  then
-                    putChar '\b' >> (go $ init acc)
-                  else
-                    go acc
+        '\DEL' -> let (op, f) = if null acc
+                                then (pure (), id) -- do nothing
+                                else (putChar '\b', init) -- backwards and delete last
+                  in op >> (go $ f acc)
         _ -> putChar c >> (go $ acc ++ [c])
         
