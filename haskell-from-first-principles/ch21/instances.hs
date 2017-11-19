@@ -24,3 +24,14 @@ instance Foldable Optional where
 instance Traversable Optional where
   traverse f (Da x) = Da <$> f x
   traverse _ Njet = pure Njet
+
+data List a = Nil | Cons a (List a) deriving Show
+instance Functor List where
+  fmap _ Nil = Nil
+  fmap f (Cons x xs) = Cons (f x) $ fmap f xs
+instance Foldable List where
+  foldr _ acc Nil = acc
+  foldr f acc (Cons x xs) = f x $ foldr f acc xs
+instance Traversable List where
+  traverse _ Nil = pure Nil
+  traverse f (Cons x xs) = (Cons <$> f x) <*> (traverse f xs)
