@@ -35,3 +35,27 @@ instance Foldable List where
 instance Traversable List where
   traverse _ Nil = pure Nil
   traverse f (Cons x xs) = (Cons <$> f x) <*> (traverse f xs)
+
+data Three a b c = Three a b c
+instance Functor (Three a b) where
+  fmap f (Three x y z) = Three x y $ f z
+instance Foldable (Three a b) where
+  foldr f acc (Three _ _ x) = f x acc
+instance Traversable (Three a b) where
+  traverse f (Three x y z) = (Three x y) <$> f z
+
+data Three' a b = Three' a b b
+instance Functor (Three' a) where
+  fmap f (Three' x y z) = Three' x (f y) (f z)
+instance Foldable (Three' a) where
+  foldr f acc (Three' _ x y) = f x $ f y acc
+instance Traversable (Three' a) where
+  traverse f (Three' x y z) = (Three' x) <$> f y <*> f z
+
+data S n a = S (n a) a
+instance Functor n => Functor (S n) where
+  fmap f (S x y) = S (f <$> x) $ f y
+instance Foldable n => Foldable (S n) where
+  foldr f acc (S x y) = foldr f (f y acc) x
+instance Traversable n => Traversable (S n) where
+  traverse f (S x y) = S <$> traverse f x <*> f y
