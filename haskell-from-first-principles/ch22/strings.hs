@@ -15,3 +15,12 @@ fmapped = cap <$> rev
 apped :: String -> String
 apped = pure cap <*> rev
 
+tupled :: String -> (String, String)
+tupled = pure (,) <*> cap <*> rev
+
+tupledMonad :: String -> (String, String)
+tupledMonad = do
+  x <- cap
+  y <- rev
+  pure (x, y)
+
