@@ -31,3 +31,8 @@ getDogR = pure Dog <*> Reader dogName <*> Reader address
 
 getDogA :: Person -> Dog
 getDogA = pure Dog <*> dogName <*> address
+
+instance Monad (Reader r) where
+  return = pure
+  (>>=) :: Reader r a -> (a -> Reader r b) -> Reader r b
+  (Reader ra) >>= aRb = Reader $ \r -> (runReader $ aRb (ra r)) r
