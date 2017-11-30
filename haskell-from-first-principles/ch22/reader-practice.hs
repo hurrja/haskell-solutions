@@ -44,3 +44,5 @@ main = do
   print . fromMaybe [] $ sequA <$> s'
   print . fromMaybe False $ bolt <$> ys
   print . (fmap . fmap) bolt z' $ 2
+  print . (liftA . liftA) bolt z' $ 2 -- alternative
+  print . fmap bolt <$> z' $ 2
