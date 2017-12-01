@@ -45,4 +45,4 @@ main = do
   print . fromMaybe False $ bolt <$> ys
   print . (fmap . fmap) bolt z' $ 2
   print . (liftA . liftA) bolt z' $ 2 -- alternative
-  print . fmap bolt <$> z' $ 2
+  print . fmap bolt <$> z' $ 2 -- another alternative
