@@ -1,19 +1,20 @@
-newtype State s a = ST { runState :: s -> (a, s) }
+-- newtype with function to provide output and next state (state function 'sf')
+newtype State s a = ST (s -> (a, s))
 
 instance Functor (State s) where
-  fmap f (ST rs) = ST $ \st -> let (y, ns) = rs st in (f y, ns)
+  fmap f (ST sf) = ST $ \s -> let (y, ns) = sf s in (f y, ns)
   
 instance Applicative (State s) where
-  pure x = ST $ \st -> (x, st)
-  (ST f) <*> (ST rs) = ST $ \st ->
+  pure v = ST $ \s -> (v, s)
+  (ST f) <*> (ST sf) = ST $ \s ->
     let
-      (y, ns) = rs st
+      (y, ns) = sf s
       (g, nns) = f ns
     in (g y, nns)
   
 instance Monad (State s) where
   return = pure
-  (ST rs) >>= f = ST $ \st -> let (x, ns) = rs st
-                                  ST rs2 = f x
-                              in rs2 ns
+  (ST sf) >>= f = ST $ \s -> let (v, ns) = sf s
+                                 ST sf2 = f v
+                              in sf2 ns
                           
