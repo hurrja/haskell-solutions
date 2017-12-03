@@ -23,17 +23,18 @@ instance Monad (StTrans s) where
                                  ST st2 = f v
                              in st2 ns
                           
+-- ----------------------------------------------------------------
+-- the die casting code begins here
+
+-- state type from System.Random
 type DieState = StdGen
 mkDieState :: Int -> DieState
 mkDieState = mkStdGen
 
 -- applicative case: cast a die n times, starting with initial state
 cast :: Int -> DieState -> ([Int], DieState)
-cast n = runStTrans $ go n
+cast n = runStTrans $ foldr (<*>) (pure []) $ replicate n doCast
   where
-    go m = case m of
-      0 -> pure [] -- empty cast sequence, no change to state
-      _ -> doCast <*> go (m - 1) -- cast once and recurse
     doCast :: StTrans DieState ([Int]->[Int])
     doCast = ST $ \s -> let (v, ns) = next s
                             d = mod v 6 + 1
