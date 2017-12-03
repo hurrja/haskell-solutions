@@ -23,10 +23,20 @@ instance Monad (StTrans s) where
                                  ST st2 = f v
                              in st2 ns
                           
--- cast :: Int -> [Int]
--- cast seed = runStTrans (foldr ((<*>) doCast)
-cast :: StTrans StdGen ([Int]->[Int])
-cast = ST $ \s -> let (v, ns) = next s
-                      d = mod v 6 + 1
-                  in ((d:), ns)
+type DieState = StdGen
+mkDieState :: Int -> DieState
+mkDieState = mkStdGen
+
+-- cast a die n times, starting with initial state s
+cast :: Int -> DieState -> ([Int], DieState)
+cast n s = runStTrans (go n) s
+  where
+    go m = case m of
+      0 -> pure []
+      _ -> doCast <*> go (m - 1)
+                            
+doCast :: StTrans DieState ([Int]->[Int])
+doCast = ST $ \s -> let (v, ns) = next s
+                        d = mod v 6 + 1
+                    in ((d:), ns)
 
