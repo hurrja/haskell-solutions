@@ -27,16 +27,19 @@ type DieState = StdGen
 mkDieState :: Int -> DieState
 mkDieState = mkStdGen
 
--- cast a die n times, starting with initial state s
+-- applicative case: cast a die n times, starting with initial state
 cast :: Int -> DieState -> ([Int], DieState)
-cast n s = runStTrans (go n) s
+cast n = runStTrans $ go n
   where
     go m = case m of
-      0 -> pure []
-      _ -> doCast <*> go (m - 1)
-                            
-doCast :: StTrans DieState ([Int]->[Int])
-doCast = ST $ \s -> let (v, ns) = next s
-                        d = mod v 6 + 1
-                    in ((d:), ns)
+      0 -> pure [] -- empty cast sequence, no change to state
+      _ -> doCast <*> go (m - 1) -- cast once and recurse
+    doCast :: StTrans DieState ([Int]->[Int])
+    doCast = ST $ \s -> let (v, ns) = next s
+                            d = mod v 6 + 1
+                        in ((d:), ns)
 
+
+-- monad case: cast a die n times, producing a (not strictly) increasing sequence
+castInc :: Int -> DieState -> ([Int], DieState)
+castInc = undefined
