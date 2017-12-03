@@ -33,12 +33,12 @@ mkDieState = mkStdGen
 
 -- applicative case: cast a die n times, starting with initial state
 cast :: Int -> DieState -> ([Int], DieState)
-cast n = runStTrans $ foldr (<*>) (pure []) $ replicate n doCast
+cast n = runStTrans $ foldr (<*>) (pure []) $ replicate n addCast
   where
-    doCast :: StTrans DieState ([Int]->[Int])
-    doCast = ST $ \s -> let (v, ns) = next s
-                            d = mod v 6 + 1
-                        in ((d:), ns)
+    addCast :: StTrans DieState ([Int]->[Int])
+    addCast = ST $ \s -> let (v, ns) = next s
+                             d = mod v 6 + 1
+                         in ((d:), ns)
 
 
 -- monad case: cast a die n times, producing a (not strictly) increasing sequence
