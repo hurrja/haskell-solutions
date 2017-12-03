@@ -1,20 +1,32 @@
--- newtype with function to provide output and next state (state function 'sf')
-newtype State s a = ST (s -> (a, s))
+import System.Random
 
-instance Functor (State s) where
-  fmap f (ST sf) = ST $ \s -> let (y, ns) = sf s in (f y, ns)
+-- newtype with function to provide value and next state
+newtype StTrans s a = ST {runStTrans :: s -> (a, s)}
+
+-- below, 's' refers to "state", 'ns' to "next state", 'v' to value,
+-- and 'st' to state transformer
+
+instance Functor (StTrans s) where
+  fmap f (ST st) = ST $ \s -> let (v, ns) = st s in (f v, ns)
   
-instance Applicative (State s) where
+instance Applicative (StTrans s) where
   pure v = ST $ \s -> (v, s)
-  (ST f) <*> (ST sf) = ST $ \s ->
+  (ST f) <*> (ST st) = ST $ \s ->
     let
-      (y, ns) = sf s
+      (v, ns) = st s
       (g, nns) = f ns
-    in (g y, nns)
+    in (g v, nns)
   
-instance Monad (State s) where
+instance Monad (StTrans s) where
   return = pure
-  (ST sf) >>= f = ST $ \s -> let (v, ns) = sf s
-                                 ST sf2 = f v
-                              in sf2 ns
+  (ST st) >>= f = ST $ \s -> let (v, ns) = st s
+                                 ST st2 = f v
+                             in st2 ns
                           
+-- cast :: Int -> [Int]
+-- cast seed = runStTrans (foldr ((<*>) doCast)
+cast :: StTrans StdGen ([Int]->[Int])
+cast = ST $ \s -> let (v, ns) = next s
+                      d = mod v 6 + 1
+                  in ((d:), ns)
+
