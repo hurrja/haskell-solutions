@@ -49,3 +49,5 @@ newCast :: [Int] -> StTrans DieState [Int]
 newCast past = ST $ \s -> let (v, ns) = next s
                               d = mod v 6 + 1
                           in (d : past, ns)
+foo :: Int -> Int -> Int
+foo n x = (x + n) `mod` 6 + 1
