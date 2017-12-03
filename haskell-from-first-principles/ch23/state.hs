@@ -41,6 +41,11 @@ cast n = runStTrans $ foldr (<*>) (pure []) $ replicate n addCast
                          in ((d:), ns)
 
 
--- monad case: cast a die n times, producing a (not strictly) increasing sequence
-castInc :: Int -> DieState -> ([Int], DieState)
-castInc = undefined
+-- monad case: cast a die n times, producing a list where concecutive
+-- casts have different values
+castDiff :: Int -> DieState -> ([Int], DieState)
+castDiff n = runStTrans $ foldl (>>=) (pure []) $ replicate n newCast
+newCast :: [Int] -> StTrans DieState [Int]
+newCast past = ST $ \s -> let (v, ns) = next s
+                              d = mod v 6 + 1
+                          in (d : past, ns)
