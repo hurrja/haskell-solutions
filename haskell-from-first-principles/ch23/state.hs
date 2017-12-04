@@ -41,13 +41,21 @@ cast n = runStTrans $ foldr (<*>) (pure []) $ replicate n addCast
                          in ((d:), ns)
 
 
--- monad case: cast a die n times, producing a list where concecutive
+-- monad case: cast a die n times, producing a list where consecutive
 -- casts have different values
 castDiff :: Int -> DieState -> ([Int], DieState)
 castDiff n = runStTrans $ foldl (>>=) (pure []) $ replicate n newCast
-newCast :: [Int] -> StTrans DieState [Int]
-newCast past = ST $ \s -> let (v, ns) = next s
-                              d = mod v 6 + 1
-                          in (d : past, ns)
-foo :: Int -> Int -> Int
-foo n x = (x + n) `mod` 6 + 1
+  where
+    newCast :: [Int] -> StTrans DieState [Int]
+    newCast past = ST $ \s -> let (v, ns) = next s
+                                  d = case past of
+                                        [] -> mod v 6 + 1
+                                        _ -> exclude (head past) (mod v 5)
+                              in (d : past, ns)
+      where
+        -- maps v in [0..4] to a value from [1..6] that excludes x
+        -- example:
+        -- λ> map (exclude 3) [0..4] 
+        -- [4,5,6,1,2]
+        exclude :: Int -> Int -> Int
+        exclude x v = (v + x) `mod` 6 + 1
