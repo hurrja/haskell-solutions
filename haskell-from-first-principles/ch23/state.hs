@@ -1,4 +1,12 @@
-import System.Random
+-- Here I take a different approach from the one in the book, because
+-- the book no longer explains all the concepts used. This is an
+-- amalgamation of the books idea to use random number generation as
+-- an example of state, and Hutton's approach to model state using
+-- state transformers. Here I have implemented both an applicative
+-- case and a monad case, where in the monad case the past of casts is
+-- used.
+
+import System.Random (StdGen, mkStdGen, next)
 
 -- newtype with function to provide value and next state
 newtype StTrans s a = ST {runStTrans :: s -> (a, s)}
