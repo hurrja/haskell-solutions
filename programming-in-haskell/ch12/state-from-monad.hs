@@ -16,9 +16,12 @@ instance Applicative ST where
     v <- stx
     f <- stf
     pure $ f v
-    
+  -- same without do
+  -- stf <*> stx = stx >>= (\v -> stf >>= (\f -> pure $ f v))
 
 instance Functor ST where
   fmap g st = do
     v <- st
     pure $ g v
+  -- same without do
+  -- fmap g st = st >>= (\v -> pure $ g v)
