@@ -4,25 +4,23 @@ import Control.Applicative
 newtype Parser a = P { parse :: String -> Maybe (a, String) }
 
 instance Functor Parser where
-  fmap f (P p) = P (\s -> fmap (\(v, r) -> (f v, r)) $ p s)
+  fmap f p = P $ \s -> fmap (\(v, r) -> (f v, r)) $ parse p s
 
 instance Applicative Parser where
   pure v = P $ \s -> Just (v, s)
-  (P pf) <*> (P p) = P (\s -> case pf s of
-                                Nothing -> Nothing
-                                Just (f, r) -> case p r of
-                                  Nothing -> Nothing
-                                  Just (v, r2) -> Just (f v, r2))
+  pf <*> p = P (\s -> case parse pf s of
+                        Nothing -> Nothing
+                        Just (f, r) -> parse (fmap f p) r)
   
 instance Monad Parser where
   return = pure
-  (P p) >>= f = P (\s -> case p s of
-                      Nothing -> Nothing
-                      Just (v, r) -> parse (f v) $ r)
+  p >>= f = P (\s -> case parse p s of
+                       Nothing -> Nothing
+                       Just (v, r) -> parse (f v) r)
                           
 instance Alternative Parser where
   empty = P $ \_ -> Nothing
-  (P pa) <|> (P pb) = P $ \s -> pa s <|> pb s
+  pa <|> pb = P $ \s -> parse pa s <|> parse pb s
 
 empty :: Parser Bool
 empty = P $ \s -> if null s then Just (True, s) else Nothing
