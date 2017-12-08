@@ -8,12 +8,12 @@ instance Functor Parser where
 
 instance Applicative Parser where
   pure v = P $ \s -> Just (v, s)
-  (P pf) <*> (P p) = P (\s -> case p s of
+  (P pf) <*> (P p) = P (\s -> case pf s of
                                 Nothing -> Nothing
-                                Just (v, r) -> case pf r of
+                                Just (f, r) -> case p r of
                                   Nothing -> Nothing
-                                  Just (f, r2) -> Just (f v, r2))
-
+                                  Just (v, r2) -> Just (f v, r2))
+  
 instance Monad Parser where
   return = pure
   (P p) >>= f = P (\s -> case p s of
