@@ -7,7 +7,10 @@ instance Functor Parser where
 
 instance Applicative Parser where
   pure v = P (\s -> Just (v, s))
-  (P pf) <*> (P p) = P (\s -> fmap (\(v, r) -> case pf r of
-                                                Nothing -> Nothing
-                                                Just (f, r2) -> Just (f v, r2)) $ p s)
+  (P pf) <*> (P p) = P (\s -> case p s of
+                                Nothing -> Nothing
+                                Just (v, r) -> case pf r of
+                                  Nothing -> Nothing
+                                  Just (f, r2) -> Just (f v, r2))
+
                           
