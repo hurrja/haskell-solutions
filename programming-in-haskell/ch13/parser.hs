@@ -13,4 +13,15 @@ instance Applicative Parser where
                                   Nothing -> Nothing
                                   Just (f, r2) -> Just (f v, r2))
 
+instance Monad Parser where
+  return = pure
+  (P p) >>= f = P (\s -> case p s of
+                      Nothing -> Nothing
+                      Just (v, r) -> parse (f v) $ r)
                           
+
+accept :: (Char -> Bool) -> Parser Char
+accept p = P $ (\s -> case s of
+                        [] -> Nothing
+                        (c:cs) -> if p c then Just (c, cs) else Nothing)
+
