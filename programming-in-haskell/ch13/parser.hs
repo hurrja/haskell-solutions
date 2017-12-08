@@ -19,7 +19,9 @@ instance Monad Parser where
                       Nothing -> Nothing
                       Just (v, r) -> parse (f v) $ r)
                           
-
+empty :: Parser Bool
+empty = P $ (\s -> if null s then Just (True, s) else Nothing)
+             
 accept :: (Char -> Bool) -> Parser Char
 accept p = P $ (\s -> case s of
                         [] -> Nothing
