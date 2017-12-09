@@ -1,5 +1,6 @@
 module Parser where
 import Control.Applicative
+import Data.Char
 
 newtype Parser a = P { parse :: String -> Maybe (a, String) }
 
@@ -30,17 +31,49 @@ accept p = P (\s -> case s of
                       [] -> Nothing
                       (c:cs) -> if p c then Just (c, cs) else Nothing)
 
+acceptChar :: Char -> Parser Char
+acceptChar c = accept (== c)
+
 comma :: Parser Char
-comma = accept (== ',')
+comma = acceptChar ','
 
 whitespace :: Parser Char
-whitespace = accept $ \c -> (c == '\t') || (c == ' ')
+whitespace = acceptChar '\t' <|> acceptChar ' '
 
 newline :: Parser Char
-newline = accept (== '\n')
+newline = acceptChar '\n'
 
 doubleQuote :: Parser Char
-doubleQuote = accept (== '"')
+doubleQuote = acceptChar '"'
+
+digit :: Parser Int
+digit = do
+  d <- accept isDigit
+  pure (read (d:[]) :: Int)
+
+token :: Parser a -> Parser a
+token p = do
+  _ <- many whitespace
+  t <- p
+  _ <- many whitespace
+  pure t
+
+quotedString :: Parser String
+quotedString = do
+  _ <- token doubleQuote
+  str <- many (accept (/= '"'))
+  _ <- token doubleQuote
+  pure str
+
+natural :: Parser Int
+natural = do
+  d <- some digit
+  pure $ foldl (\acc v -> 10*acc + v) 0 d
+
+-- integer :: Parser Integer
+-- integer = do
+--   _ <- acceptChar '-'
+  
 
 data CSVItem = CSVString String | CSVInteger Integer
 csvRow :: Parser [CSVItem]
