@@ -37,6 +37,9 @@ acceptChar c = accept (== c)
 comma :: Parser Char
 comma = acceptChar ','
 
+dot :: Parser Char
+dot = acceptChar '.'
+
 whitespace :: Parser Char
 whitespace = acceptChar '\t' <|> acceptChar ' '
 
@@ -51,6 +54,17 @@ digit = do
   d <- accept isDigit
   pure (read (d:[]) :: Int)
 
+natural :: Parser Int
+natural = do
+  d <- some digit
+  pure $ foldl (\acc v -> 10*acc + v) 0 d
+
+negInteger :: Parser Int
+negInteger = do
+    _ <- acceptChar '-'
+    n <- natural
+    pure (-n)
+
 token :: Parser a -> Parser a
 token p = do
   _ <- many whitespace
@@ -60,22 +74,17 @@ token p = do
 
 quotedString :: Parser String
 quotedString = do
-  _ <- token doubleQuote
+  _ <- doubleQuote
   str <- many (accept (/= '"'))
-  _ <- token doubleQuote
+  _ <- doubleQuote
   pure str
 
-natural :: Parser Int
-natural = do
-  d <- some digit
-  pure $ foldl (\acc v -> 10*acc + v) 0 d
+integer :: Parser Int
+integer = negInteger <|> natural
 
--- integer :: Parser Integer
--- integer = do
---   _ <- acceptChar '-'
-  
-
-data CSVItem = CSVString String | CSVInteger Integer
+data CSVItem = CSVStr String | CSVInt Int deriving Show
+csvItem :: Parser CSVItem
+csvItem = token $ do { i <- integer; pure $ CSVInt i} <|> do { s <- quotedString; pure $ CSVStr s }
 csvRow :: Parser [CSVItem]
 csvRow = undefined
 
