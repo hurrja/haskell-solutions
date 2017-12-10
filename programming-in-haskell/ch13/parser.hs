@@ -86,7 +86,7 @@ data CSVItem = CSVStr String | CSVInt Int deriving Show
 csvItem :: Parser CSVItem
 csvItem = token $ do { i <- integer; pure $ CSVInt i} <|> do { s <- quotedString; pure $ CSVStr s }
 csvRow :: Parser [CSVItem]
-csvRow = undefined
+csvRow = do { i <- csvItem; _ <- newline; pure [i] } <|> do { i <- csvItem; _ <- comma; r <- csvRow; pure $ i : r }
 
 csvParser :: Parser [[CSVItem]]
 csvParser = undefined
