@@ -89,4 +89,4 @@ csvRow :: Parser [CSVItem]
 csvRow = do { i <- csvItem; ((newline <|> end) >> pure [i]) <|> do {_ <- comma; r <- csvRow; pure $ i : r }}
 
 csvParser :: Parser [[CSVItem]]
-csvParser = (end >> pure []) <|> do { r <- csvRow; rs <- csvParser; pure $ r : rs } <|> do { _ <- newline; csvParser }
+csvParser = (end >> pure []) <|> do { r <- csvRow; rs <- csvParser; pure $ r : rs } <|> (newline >> csvParser)
