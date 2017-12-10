@@ -86,7 +86,7 @@ data CSVItem = CSVStr String | CSVInt Int deriving Show
 csvItem :: Parser CSVItem
 csvItem = token $ do { i <- integer; pure $ CSVInt i} <|> do { s <- quotedString; pure $ CSVStr s }
 csvRow :: Parser [CSVItem]
-csvRow = do { i <- csvItem; do {_ <- newline <|> end ; pure [i] } <|> do {_ <- comma; r <- csvRow; pure $ i : r }}
+csvRow = do { i <- csvItem; ((newline <|> end) >> pure [i]) <|> do {_ <- comma; r <- csvRow; pure $ i : r }}
 
 csvParser :: Parser [[CSVItem]]
-csvParser = do { _ <- end; pure [] } <|> do { r <- csvRow; rs <- csvParser; pure $ r : rs }
+csvParser = (end >> pure []) <|> do { r <- csvRow; rs <- csvParser; pure $ r : rs }
