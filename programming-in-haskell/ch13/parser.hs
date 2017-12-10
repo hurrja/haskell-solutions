@@ -23,8 +23,8 @@ instance Alternative Parser where
   empty = P $ \_ -> Nothing
   pa <|> pb = P $ \s -> parse pa s <|> parse pb s
 
-empty :: Parser Bool
-empty = P $ \s -> if null s then Just (True, s) else Nothing
+end :: Parser Bool
+end = P $ \s -> if null s then Just (True, s) else Nothing
              
 accept :: (Char -> Bool) -> Parser Char
 accept p = P (\s -> case s of
@@ -43,8 +43,8 @@ dot = acceptChar '.'
 whitespace :: Parser Char
 whitespace = acceptChar '\t' <|> acceptChar ' '
 
-newline :: Parser Char
-newline = acceptChar '\n'
+newline :: Parser Bool
+newline = do { _ <- acceptChar '\n'; pure True }
 
 doubleQuote :: Parser Char
 doubleQuote = acceptChar '"'
@@ -86,7 +86,7 @@ data CSVItem = CSVStr String | CSVInt Int deriving Show
 csvItem :: Parser CSVItem
 csvItem = token $ do { i <- integer; pure $ CSVInt i} <|> do { s <- quotedString; pure $ CSVStr s }
 csvRow :: Parser [CSVItem]
-csvRow = do { i <- csvItem; _ <- newline; pure [i] } <|> do { i <- csvItem; _ <- comma; r <- csvRow; pure $ i : r }
+csvRow = do { i <- csvItem; do {_ <- newline <|> end ; pure [i] } <|> do {_ <- comma; r <- csvRow; pure $ i : r }}
 
 csvParser :: Parser [[CSVItem]]
-csvParser = undefined
+csvParser = do { _ <- end; pure [] } <|> do { r <- csvRow; rs <- csvParser; pure $ r : rs }
