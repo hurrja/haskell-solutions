@@ -84,7 +84,7 @@ integer = negInteger <|> natural
 
 data CSVItem = CSVStr String | CSVInt Int deriving Show
 csvItem :: Parser CSVItem
-csvItem = token $ do { i <- integer; pure $ CSVInt i} <|> do { s <- quotedString; pure $ CSVStr s }
+csvItem = token $ (integer >>= pure . CSVInt) <|> (quotedString >>= pure . CSVStr)
 csvRow :: Parser [CSVItem]
 csvRow = do { i <- csvItem; ((newline <|> end) >> pure [i]) <|> do {_ <- comma; r <- csvRow; pure $ i : r }}
 
