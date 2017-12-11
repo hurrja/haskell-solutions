@@ -90,3 +90,7 @@ csvRow = do { i <- csvItem; ((newline <|> end) >> pure [i]) <|> do {_ <- comma; 
 
 csvParser :: Parser [[CSVItem]]
 csvParser = (end >> pure []) <|> do { r <- csvRow; rs <- csvParser; pure $ r : rs } <|> (newline >> csvParser)
+
+parseCSVFile :: String -> IO (Maybe [[CSVItem]])
+parseCSVFile filePath = (fmap . fmap) fst $ (parse csvParser) <$> readFile filePath
+
