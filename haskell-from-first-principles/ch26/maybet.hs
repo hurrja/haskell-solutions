@@ -12,6 +12,6 @@ instance Applicative m => Applicative (MaybeT m) where
 instance Monad m => Monad (MaybeT m) where
   return = pure
   (>>=) :: MaybeT m a -> (a -> MaybeT m b) -> MaybeT m b
-  (MaybeT mma) >>= f = MaybeT $ mma >>= (\v -> case v of
-                                            Nothing -> pure Nothing
-                                            (Just x) -> runMaybeT (f x))
+  (MaybeT mma) >>= f = MaybeT $ mma >>= (\v -> case fmap f v of
+                                                 Nothing -> pure Nothing
+                                                 Just x -> runMaybeT x)
