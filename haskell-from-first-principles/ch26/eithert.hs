@@ -23,3 +23,7 @@ swapEitherT (EitherT mea) = EitherT $ fmap swapEither mea
     swapEither (Left x) = Right x
     swapEither (Right x) = Left x
 
+eitherT :: Monad m => (a -> m c) -> (b -> m c) -> EitherT a m b -> m c
+eitherT amc bmc (EitherT mab) = mab >>= (\x -> case x of
+                                            Left v -> amc v
+                                            Right v -> bmc v)
