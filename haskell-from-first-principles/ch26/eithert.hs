@@ -15,3 +15,11 @@ instance Monad m => Monad (EitherT e m) where
   (EitherT mea) >>= f = EitherT $ mea >>= (\v -> case fmap f v of
                                               Left x -> pure $ Left x
                                               Right x -> runEitherT x)
+
+swapEitherT :: (Functor m) => EitherT e m a -> EitherT a m e
+swapEitherT (EitherT mea) = EitherT $ fmap swapEither mea
+  where
+    swapEither :: Either e a -> Either a e
+    swapEither (Left x) = Right x
+    swapEither (Right x) = Left x
+
