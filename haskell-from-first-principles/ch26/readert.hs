@@ -9,4 +9,9 @@ instance Applicative m => Applicative (ReaderT r m) where
   pure = ReaderT . pure . pure
   (<*>) :: ReaderT r m (a -> b) -> ReaderT r m a -> ReaderT r m b
   (ReaderT rmab) <*> (ReaderT rma) = ReaderT $ (fmap (<*>) rmab) <*> rma
+
+instance Monad m => Monad (ReaderT r m) where
+  return = pure
+  (>>=) :: ReaderT r m a -> (a -> ReaderT r m b) -> ReaderT r m b
+  (>>=) = undefined
   
