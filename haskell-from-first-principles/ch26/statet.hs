@@ -13,3 +13,8 @@ instance Monad m => Applicative (StateT s m) where
   (<*>) :: StateT s m (a -> b) -> StateT s m a -> StateT s m b
   (StateT smfs) <*> (StateT smas) = StateT $ \s -> smfs s >>= \(f, s2) -> fmap (fstMap f) $ smas s2
   
+instance Monad m => Monad (StateT s m) where
+  return = pure
+  (>>=) :: StateT s m a -> (a -> StateT s m b) -> StateT s m b
+  (StateT smas) >>= f = StateT $ \s -> smas s >>= \(a, s2) -> runStateT (f a) s2
+  
