@@ -4,7 +4,9 @@ import Control.Monad.Trans.Reader
 
 -- the most important thing to take from this exercise is the fact
 -- that the structural order of monad transformers is reversed from
--- the lexical one except for ReaderT
+-- the lexical one except for ReaderT; ReaderT data constructor is
+-- followed immediately by the corresponding structural equivalent
+-- (constructor argument)
 
 -- the actual exercise
 embedded :: MaybeT (ExceptT String (ReaderT () IO)) Int
