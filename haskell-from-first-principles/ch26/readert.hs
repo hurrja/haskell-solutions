@@ -1,5 +1,7 @@
 {-# LANGUAGE InstanceSigs #-}
 
+import Control.Monad.Trans.Class
+
 newtype ReaderT r m a = ReaderT { runReaderT :: r -> m a }
 
 instance Functor m => Functor (ReaderT r m) where
@@ -15,3 +17,11 @@ instance Monad m => Monad (ReaderT r m) where
   (>>=) :: ReaderT r m a -> (a -> ReaderT r m b) -> ReaderT r m b
   (ReaderT rma) >>= f = ReaderT $ \r -> rma r >>= \a -> (runReaderT (f a)) r
   
+instance MonadTrans (ReaderT r) where
+  lift = ReaderT . const
+
+foo :: ReaderT String Maybe Int
+foo = lift $ Just 1
+
+bar :: Maybe Int
+bar = (runReaderT $ foo >>= pure . (1+)) "abc"
