@@ -2,6 +2,7 @@
 
 import Control.Monad
 import Control.Monad.Trans.Class
+import Control.Monad.IO.Class
 
 newtype StateT s m a = StateT { runStateT :: s -> m (a, s) }
 
@@ -23,3 +24,6 @@ instance Monad m => Monad (StateT s m) where
   
 instance MonadTrans (StateT s) where
   lift ma = StateT $ \s -> liftM (\a -> (a, s)) ma
+
+instance (MonadIO m) => MonadIO (StateT s m) where
+  liftIO = lift . liftIO
