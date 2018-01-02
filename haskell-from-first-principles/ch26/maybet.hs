@@ -1,5 +1,7 @@
 {-# LANGUAGE InstanceSigs #-}
 
+import Control.Monad.IO.Class
+
 newtype MaybeT m a = MaybeT { runMaybeT :: m (Maybe a) }
 
 instance Functor m => Functor (MaybeT m) where
@@ -15,3 +17,6 @@ instance Monad m => Monad (MaybeT m) where
   (MaybeT mma) >>= f = MaybeT $ mma >>= (\v -> case fmap f v of
                                                  Nothing -> pure Nothing
                                                  Just x -> runMaybeT x)
+
+instance MonadIO m => MonadIO (MaybeT m) where
+  liftIO i = MaybeT $ fmap Just (liftIO i)
