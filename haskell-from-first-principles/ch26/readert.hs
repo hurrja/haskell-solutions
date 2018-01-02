@@ -1,5 +1,6 @@
 {-# LANGUAGE InstanceSigs #-}
 
+import Control.Monad.IO.Class
 import Control.Monad.Trans.Class
 
 newtype ReaderT r m a = ReaderT { runReaderT :: r -> m a }
@@ -19,6 +20,13 @@ instance Monad m => Monad (ReaderT r m) where
   
 instance MonadTrans (ReaderT r) where
   lift = ReaderT . const
+
+instance MonadIO m => MonadIO (ReaderT r m) where
+--  liftIO i = ReaderT $ \_ -> liftIO i
+--  liftIO i = ReaderT $ const (liftIO i)
+--  liftIO i = ReaderT . const $ liftIO i
+--  liftIO i = lift $ liftIO i
+  liftIO = lift . liftIO
 
 foo :: ReaderT String Maybe Int
 foo = lift $ Just 1
