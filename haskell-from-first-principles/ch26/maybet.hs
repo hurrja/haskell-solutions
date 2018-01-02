@@ -1,6 +1,8 @@
 {-# LANGUAGE InstanceSigs #-}
 
+import Control.Monad
 import Control.Monad.IO.Class
+import Control.Monad.Trans.Class
 
 newtype MaybeT m a = MaybeT { runMaybeT :: m (Maybe a) }
 
@@ -18,5 +20,13 @@ instance Monad m => Monad (MaybeT m) where
                                                  Nothing -> pure Nothing
                                                  Just x -> runMaybeT x)
 
+instance MonadTrans MaybeT where
+  lift = MaybeT . liftM Just
+
 instance MonadIO m => MonadIO (MaybeT m) where
-  liftIO i = MaybeT $ fmap Just (liftIO i)
+  -- evolution from what makes sense to the shortest form
+--  liftIO i = MaybeT $ fmap Just (liftIO i)
+--  liftIO i = MaybeT $ liftM Just (liftIO i)
+--  liftIO i = (MaybeT . liftM Just) (liftIO i)
+--  liftIO i = lift (liftIO i)
+  liftIO = lift . liftIO
