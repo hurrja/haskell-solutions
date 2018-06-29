@@ -1,0 +1,19 @@
+* exercise pages
+** skipping projects and testing for now
+  - 577
+  - 604
+  - 606
+  - 613
+  - 628
+  - 638
+  - 650
+  - 691
+** working on these
+  - 817
+  - 821
+  - 823
+  - 824
+  - 836
+  - 862
+  - 871
+  - 
