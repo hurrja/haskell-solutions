@@ -48,7 +48,6 @@ eval e = do
   v <- e
   Val (if v == 'x' then 3 else 0)
   
-
 foo :: (Expr Char) -> (Expr Char) -> (Expr String)
 foo e1 e2 = do
   v1 <- e1
