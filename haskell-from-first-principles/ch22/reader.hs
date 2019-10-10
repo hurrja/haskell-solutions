@@ -37,8 +37,17 @@ instance Monad (Reader r) where
   (>>=) :: Reader r a -> (a -> Reader r b) -> Reader r b
   (Reader ra) >>= aRb = Reader $ \r -> (runReader $ aRb (ra r)) r
 
-getDogRM :: Person -> Dog
-getDogRM = do
+-- this version uses builtin "reader" monad (->) r
+getDogM :: Person -> Dog
+getDogM = do
   n <- dogName
   a <- address
   pure $ Dog n a
+
+-- this version uses own Reader monad
+getDogRM :: Person -> Dog
+getDogRM = runReader (
+  do
+    n <- Reader dogName
+    a <- Reader address
+    pure $ Dog n a)
